@@ -228,6 +228,23 @@ export default function App() {
       const el = cardsRef.current[i];
       if (!el) return;
       el.style.willChange = "transform";
+
+      // direction of approach — used to bias overshoot/squash
+      const dx = p.startOffsetX;
+      const dy = p.startOffsetY;
+      const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+      const nx = dx / dist;
+      const ny = dy / dist;
+      // overshoot positions: card flies PAST rest, then elastic-pulls back
+      const overshootDist = 24 + Math.random() * 12;
+      const overX = p.restX + (-nx) * overshootDist;
+      const overY = p.restY + (-ny) * overshootDist;
+      // mid-flight rotation overspin — card does an extra half-turn before settling
+      const spinDir = Math.sign(p.restRotZ - p.startRotZ) || 1;
+      const overRotZ = p.restRotZ + spinDir * (18 + Math.random() * 10);
+      // jitter for natural per-card character
+      const wobbleAmp = 4 + Math.random() * 3;
+
       gsap.set(el, {
         x: p.restX + p.startOffsetX,
         y: p.restY + p.startOffsetY,
@@ -235,12 +252,35 @@ export default function App() {
         rotationZ: p.startRotZ,
         rotationX: 30,
         rotationY: -25,
-        scale: 1.25,
+        scaleX: 1.3,
+        scaleY: 1.1,
         opacity: 0,
       });
 
+      // fade in mid-flight
       tl.to(el, { opacity: 1, duration: 0.14, ease: "power1.out" }, p.delay);
 
+      // Phase A — hero-flight to OVERSHOOT pos + OVERSPIN rot. Power3.out = fast decel.
+      // Squash-stretch: card stretches along motion vector (scaleY bigger as it leans into flight)
+      tl.to(
+        el,
+        {
+          x: overX,
+          y: overY,
+          z: 60,
+          rotationZ: overRotZ,
+          rotationX: p.restRotX - 8,
+          rotationY: p.restRotY + 6,
+          scaleX: 0.96,
+          scaleY: 1.08,
+          ease: "power3.out",
+          duration: 0.62,
+        },
+        p.delay + 0.02
+      );
+
+      // Phase B — elastic settle to rest. This is where "the bounce" lives.
+      // elastic.out(amplitude, period): amp = how far it overshoots, period = osc duration.
       tl.to(
         el,
         {
@@ -250,23 +290,38 @@ export default function App() {
           rotationZ: p.restRotZ,
           rotationX: p.restRotX,
           rotationY: p.restRotY,
-          scale: 1.0,
-          ease: "back.out(1.7)",
-          duration: 0.95,
+          scaleX: 1.0,
+          scaleY: 1.0,
+          ease: "elastic.out(1.05, 0.42)",
+          duration: 1.05,
         },
-        p.delay + 0.02
+        p.delay + 0.62
       );
 
-      // landing "клац"
+      // landing impact — micro squash on touchdown + elastic decay
       tl.to(
         el,
         {
           keyframes: [
-            { scale: 1.06, duration: 0.08, ease: "power2.out" },
-            { scale: 1.0, duration: 0.18, ease: "back.out(2.2)" },
+            { scaleX: 1.14, scaleY: 0.86, duration: 0.09, ease: "power2.out" },
+            { scaleX: 0.97, scaleY: 1.05, duration: 0.13, ease: "power2.inOut" },
+            { scaleX: 1.0, scaleY: 1.0, duration: 0.32, ease: "elastic.out(1.2, 0.38)" },
           ],
         },
-        p.delay + 0.92
+        p.delay + 0.58
+      );
+
+      // mid-flight tilt-wobble — keeps card feeling alive, not on a rail
+      tl.to(
+        el,
+        {
+          rotationY: `+=${wobbleAmp}`,
+          duration: 0.28,
+          yoyo: true,
+          repeat: 1,
+          ease: "sine.inOut",
+        },
+        p.delay + 0.18
       );
     });
 
