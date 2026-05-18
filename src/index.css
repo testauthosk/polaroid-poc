@@ -1,0 +1,179 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --stage-bg: #f4ede0;
+  --stage-bg-deep: #ede4d2;
+  --paper: #fefcf6;
+  --ink: #1a1a1a;
+  --accent: #c4541f;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: var(--stage-bg);
+  color: var(--ink);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  overflow: hidden;
+}
+
+/* 3D stage: parent gives perspective, children use preserve-3d */
+.stage {
+  perspective: 1400px;
+  perspective-origin: 50% 40%;
+}
+
+.polaroid {
+  /* size + shape */
+  width: 220px;
+  aspect-ratio: 4 / 5;
+  background: var(--paper);
+  /* polaroid white border */
+  padding: 14px 14px 56px 14px;
+  border-radius: 4px;
+  /* layered realistic shadow (Comeau-style elevation) */
+  box-shadow:
+    0 1px 2px rgba(20, 14, 4, 0.10),
+    0 2px 4px rgba(20, 14, 4, 0.08),
+    0 6px 10px rgba(20, 14, 4, 0.10),
+    0 14px 26px rgba(20, 14, 4, 0.14);
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  /* faint paper texture via inset shadow */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  /* base centering — overridden by GSAP */
+  transform: translate3d(-50%, -50%, 0);
+  /* hint browser only when active; cleaned in JS after landing */
+  will-change: transform;
+  /* prevent text/img selection during play */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.polaroid::before {
+  /* subtle paper grain */
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(circle at 25% 15%, rgba(255, 255, 255, 0.4) 0%, transparent 40%),
+    radial-gradient(circle at 80% 90%, rgba(0, 0, 0, 0.03) 0%, transparent 50%);
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  opacity: 0.6;
+}
+
+.polaroid .photo {
+  width: 100%;
+  height: 100%;
+  border-radius: 2px;
+  background-color: #cbb78a;
+  background-size: cover;
+  background-position: center;
+  display: block;
+  /* faint inner shadow to recess the photo into the frame */
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+.polaroid .caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 14px;
+  text-align: center;
+  font-family: "Caveat", "Comic Sans MS", "Segoe Script", cursive;
+  font-size: 22px;
+  color: #2a2418;
+  letter-spacing: 0.02em;
+  pointer-events: none;
+}
+
+/* control bar */
+.controls {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
+  z-index: 50;
+}
+
+.btn {
+  background: var(--ink);
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  transition: transform 200ms cubic-bezier(0.2, 0.9, 0.3, 1.4), box-shadow 200ms;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.3);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn.btn-accent {
+  background: var(--accent);
+}
+
+.header {
+  position: fixed;
+  top: 20px;
+  left: 24px;
+  z-index: 50;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.header h1 {
+  font-size: 18px;
+  margin: 0;
+}
+
+.header p {
+  margin: 2px 0 0;
+  font-size: 12px;
+  opacity: 0.55;
+  font-weight: 500;
+}
+
+/* stage backdrop — soft warm vignette to anchor the cards */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 50%, var(--stage-bg) 0%, var(--stage-bg-deep) 70%, #d8ccb2 100%);
+  pointer-events: none;
+}
+
+/* faint floor "shadow plane" — gives ground reference */
+.floor {
+  position: fixed;
+  left: 50%;
+  bottom: 22%;
+  transform: translateX(-50%);
+  width: min(720px, 80vw);
+  height: 60px;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.10) 0%, transparent 70%);
+  filter: blur(2px);
+  pointer-events: none;
+}
