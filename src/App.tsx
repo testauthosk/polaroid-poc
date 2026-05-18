@@ -4,15 +4,16 @@ import gsap from "gsap";
 type CardData = {
   src: string;
   caption: string;
-  /** rest position relative to viewport center: x in px, y in px (negative = up) */
+  region: string;
+  description: string;
+  /** rest position relative to viewport center: x in px, y in px */
   restX: number;
   restY: number;
-  /** rest rotation in degrees */
+  /** rest rotations in degrees */
   restRotZ: number;
-  /** rest tilt in 3D (degrees) — keeps cards looking slightly faceted */
   restRotX: number;
   restRotY: number;
-  /** which side it flies in from (offset from rest pos in px) */
+  /** start offset from rest pos */
   startOffsetX: number;
   startOffsetY: number;
   startRotZ: number;
@@ -22,81 +23,182 @@ type CardData = {
 
 const PHOTOS: CardData[] = [
   {
-    src: "https://images.unsplash.com/photo-1539768942893-daf53e448371?w=640&q=80&auto=format&fit=crop",
+    src: "https://images.unsplash.com/photo-1539768942893-daf53e448371?w=800&q=80&auto=format&fit=crop",
     caption: "Cairo",
-    restX: -240,
-    restY: -20,
-    restRotZ: -8,
-    restRotX: 6,
-    restRotY: -4,
-    startOffsetX: -900,
+    region: "Каир · столица",
+    description:
+      "Город минаретов и шумных базаров. Хан эль-Халили торгует пряностями уже 700 лет, а сабиль на горизонте подсвечивается на закате.",
+    restX: -320,
+    restY: -90,
+    restRotZ: -7,
+    restRotX: 5,
+    restRotY: -3,
+    startOffsetX: -1000,
     startOffsetY: -600,
     startRotZ: -180,
     delay: 0.0,
   },
   {
-    src: "https://images.unsplash.com/photo-1568322445389-f64ac2515020?w=640&q=80&auto=format&fit=crop",
-    caption: "Giza Pyramids",
-    restX: -90,
-    restY: 60,
+    src: "https://images.unsplash.com/photo-1568322445389-f64ac2515020?w=800&q=80&auto=format&fit=crop",
+    caption: "Giza",
+    region: "Пирамиды Гизы",
+    description:
+      "Последнее из семи чудес света, до сих пор стоящее. Хеопс, Хефрен, Микерин и Сфинкс на одном плато за 30 минут от центра Каира.",
+    restX: -170,
+    restY: 70,
     restRotZ: 5,
     restRotX: -4,
     restRotY: 3,
     startOffsetX: 900,
-    startOffsetY: -500,
+    startOffsetY: -700,
     startRotZ: 220,
-    delay: 0.12,
+    delay: 0.1,
   },
   {
-    src: "https://images.unsplash.com/photo-1505761671935-60b3a7427bad?w=640&q=80&auto=format&fit=crop",
-    caption: "Sharm el-Sheikh",
-    restX: 80,
-    restY: -50,
-    restRotZ: -4,
-    restRotX: 5,
+    src: "https://images.unsplash.com/photo-1505761671935-60b3a7427bad?w=800&q=80&auto=format&fit=crop",
+    caption: "Sharm",
+    region: "Шарм-эль-Шейх",
+    description:
+      "Курорт Красного моря с коралловыми рифами Рас-Мохаммеда. Дайвинг, гольф, all-inclusive и закаты над Тиранским проливом.",
+    restX: 0,
+    restY: -130,
+    restRotZ: -3,
+    restRotX: 4,
     restRotY: -2,
     startOffsetX: 0,
     startOffsetY: -1000,
     startRotZ: -90,
-    delay: 0.22,
+    delay: 0.2,
   },
   {
-    src: "https://images.unsplash.com/photo-1572252009286-268acec5ca0a?w=640&q=80&auto=format&fit=crop",
+    src: "https://images.unsplash.com/photo-1572252009286-268acec5ca0a?w=800&q=80&auto=format&fit=crop",
     caption: "Luxor",
-    restX: 230,
-    restY: 40,
-    restRotZ: 9,
-    restRotX: -6,
+    region: "Луксор · древние Фивы",
+    description:
+      "Карнакский храмовый комплекс, Долина царей, гробница Тутанхамона. Воздушный шар на рассвете над западным берегом Нила.",
+    restX: 170,
+    restY: 70,
+    restRotZ: 8,
+    restRotX: -5,
     restRotY: 4,
-    startOffsetX: 1000,
-    startOffsetY: 400,
+    startOffsetX: 1100,
+    startOffsetY: 200,
     startRotZ: 260,
-    delay: 0.34,
+    delay: 0.3,
   },
   {
-    src: "https://images.unsplash.com/photo-1583161181100-6dd2403fa44d?w=640&q=80&auto=format&fit=crop",
+    src: "https://images.unsplash.com/photo-1583161181100-6dd2403fa44d?w=800&q=80&auto=format&fit=crop",
     caption: "Hurghada",
-    restX: -30,
-    restY: -130,
-    restRotZ: -2,
+    region: "Хургада",
+    description:
+      "Песчаные пляжи и ветреные кайт-споты. Стартовая точка для дайв-сафари на южные рифы и острова Гифтун.",
+    restX: 320,
+    restY: -50,
+    restRotZ: -5,
     restRotX: 3,
     restRotY: -1,
-    startOffsetX: -700,
+    startOffsetX: -800,
     startOffsetY: 800,
     startRotZ: -270,
-    delay: 0.46,
+    delay: 0.4,
+  },
+  {
+    src: "https://images.unsplash.com/photo-1518684079-3c830dcef090?w=800&q=80&auto=format&fit=crop",
+    caption: "Dahab",
+    region: "Дахаб · Синай",
+    description:
+      "Расслабленный синайский курорт у Голубой дыры — легендарного дайв-сайта на 100+ метров. Бедуинские кафе на берегу, кайт и сноркл.",
+    restX: -240,
+    restY: 140,
+    restRotZ: 6,
+    restRotX: -3,
+    restRotY: 5,
+    startOffsetX: -1100,
+    startOffsetY: 600,
+    startRotZ: 200,
+    delay: 0.5,
+  },
+  {
+    src: "https://images.unsplash.com/photo-1610116306796-6fea9f4fae38?w=800&q=80&auto=format&fit=crop",
+    caption: "Aswan",
+    region: "Асуан · нубийский юг",
+    description:
+      "Фелюки под белым парусом по Нилу, Высотная плотина, остров Элефантина и храм Филе. Самый спокойный город на Ниле.",
+    restX: 240,
+    restY: 160,
+    restRotZ: -6,
+    restRotX: 4,
+    restRotY: -3,
+    startOffsetX: 1000,
+    startOffsetY: -300,
+    startRotZ: -240,
+    delay: 0.6,
+  },
+  {
+    src: "https://images.unsplash.com/photo-1591375372226-1be9efe43d4f?w=800&q=80&auto=format&fit=crop",
+    caption: "Alex",
+    region: "Александрия",
+    description:
+      "Средиземноморский порт, основанный Александром Македонским. Современная Bibliotheca Alexandrina и катакомбы Ком-эль-Шукафа.",
+    restX: -90,
+    restY: -220,
+    restRotZ: 4,
+    restRotX: -2,
+    restRotY: 2,
+    startOffsetX: -700,
+    startOffsetY: -900,
+    startRotZ: 160,
+    delay: 0.7,
+  },
+  {
+    src: "https://images.unsplash.com/photo-1471919743851-c4df8b6ee133?w=800&q=80&auto=format&fit=crop",
+    caption: "Marsa Alam",
+    region: "Марса-Алам",
+    description:
+      "Нетронутые рифы, дюгони в бухте Абу-Дабаб, тихие пляжи без толп. Долететь сложнее, но дайвинг лучший в Египте.",
+    restX: 100,
+    restY: 230,
+    restRotZ: 3,
+    restRotX: 5,
+    restRotY: -4,
+    startOffsetX: 800,
+    startOffsetY: 900,
+    startRotZ: -200,
+    delay: 0.8,
+  },
+  {
+    src: "https://images.unsplash.com/photo-1601553267932-1cd2a6c75ba8?w=800&q=80&auto=format&fit=crop",
+    caption: "Siwa",
+    region: "Оазис Сива",
+    description:
+      "Берберская оазисная деревня в Западной пустыне, в 50 км от ливийской границы. Солёные озёра, источник Клеопатры и крепость Шали.",
+    restX: -380,
+    restY: 220,
+    restRotZ: -8,
+    restRotX: 3,
+    restRotY: 4,
+    startOffsetX: -1200,
+    startOffsetY: 200,
+    startRotZ: 300,
+    delay: 0.9,
   },
 ];
 
 export default function App() {
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
   const tlRef = useRef<gsap.core.Timeline | null>(null);
+  const idleRef = useRef<gsap.core.Tween[]>([]);
   const [phase, setPhase] = useState<"ready" | "playing" | "rest">("ready");
+  const [activeIdx, setActiveIdx] = useState<number | null>(null);
 
-  // run the entrance animation
+  const killIdle = () => {
+    idleRef.current.forEach((t) => t.kill());
+    idleRef.current = [];
+  };
+
   const play = useCallback(() => {
-    // kill prior timeline + any free-flying tweens
     tlRef.current?.kill();
+    killIdle();
     cardsRef.current.forEach((el) => {
       if (el) gsap.killTweensOf(el);
     });
@@ -104,23 +206,20 @@ export default function App() {
     const tl = gsap.timeline({
       onComplete: () => {
         setPhase("rest");
-        // strip will-change from cards now they're resting to save GPU
-        cardsRef.current.forEach((el) => {
-          if (el) el.style.willChange = "auto";
-        });
-        // gentle idle wobble — independent loops per card so they desync
         cardsRef.current.forEach((el, i) => {
           if (!el) return;
+          el.style.willChange = "auto";
           const p = PHOTOS[i];
-          gsap.to(el, {
-            rotationZ: p.restRotZ + (Math.random() > 0.5 ? 1.2 : -1.2),
-            rotationY: p.restRotY + (Math.random() > 0.5 ? 2 : -2),
-            duration: 2.6 + Math.random() * 0.8,
+          const wobble = gsap.to(el, {
+            rotationZ: p.restRotZ + (Math.random() > 0.5 ? 1.4 : -1.4),
+            rotationY: p.restRotY + (Math.random() > 0.5 ? 2.5 : -2.5),
+            duration: 2.4 + Math.random() * 1.0,
             ease: "sine.inOut",
             yoyo: true,
             repeat: -1,
-            delay: Math.random() * 0.6,
+            delay: Math.random() * 0.8,
           });
+          idleRef.current.push(wobble);
         });
       },
     });
@@ -129,7 +228,6 @@ export default function App() {
       const el = cardsRef.current[i];
       if (!el) return;
       el.style.willChange = "transform";
-      // place at start pos with extreme z-out + heavy rotation
       gsap.set(el, {
         x: p.restX + p.startOffsetX,
         y: p.restY + p.startOffsetY,
@@ -141,14 +239,8 @@ export default function App() {
         opacity: 0,
       });
 
-      // mid-air fade-in (so they don't pop visible behind a frame)
-      tl.to(
-        el,
-        { opacity: 1, duration: 0.15, ease: "power1.out" },
-        p.delay
-      );
+      tl.to(el, { opacity: 1, duration: 0.14, ease: "power1.out" }, p.delay);
 
-      // main "flight" — overshoot easing, big arc through z-axis
       tl.to(
         el,
         {
@@ -159,14 +251,13 @@ export default function App() {
           rotationX: p.restRotX,
           rotationY: p.restRotY,
           scale: 1.0,
-          // overshoot bezier per OSINT (Codrops): cubic-bezier(.8,-.5,.2,1.8)
-          ease: "back.out(1.6)",
+          ease: "back.out(1.7)",
           duration: 0.95,
         },
         p.delay + 0.02
       );
 
-      // landing "клац" — squash on touchdown
+      // landing "клац"
       tl.to(
         el,
         {
@@ -183,28 +274,28 @@ export default function App() {
     setPhase("playing");
   }, []);
 
-  // drop animation — every card falls offscreen with gravity + tumble
   const drop = useCallback(() => {
     tlRef.current?.kill();
+    killIdle();
     cardsRef.current.forEach((el, i) => {
       if (!el) return;
       gsap.killTweensOf(el);
       el.style.willChange = "transform";
       const dir = i % 2 === 0 ? 1 : -1;
 
-      // exit timeline: gravity-y + flutter rotation (coupling per OSINT — lift via rotZ-vs-vy)
       const fall = gsap.timeline({
         onComplete: () => {
           if (el) el.style.willChange = "auto";
         },
       });
-      // tilt up first (lift), then accelerate down
+      // lift, then fall — flutter-tumble per OSINT (lift via rot↔vy coupling)
       fall.to(el, {
         rotationZ: "+=" + 20 * dir,
         rotationX: "-=10",
         y: "-=40",
         duration: 0.25,
         ease: "power1.out",
+        delay: i * 0.04,
       });
       fall.to(el, {
         y: window.innerHeight + 200,
@@ -219,11 +310,27 @@ export default function App() {
     setPhase("ready");
   }, []);
 
-  // first auto-play after mount, once images decode (so cards don't fly in blank)
+  // click on a card → open modal, pause its idle wobble
+  const openCard = (idx: number) => {
+    if (phase !== "rest") return;
+    setActiveIdx(idx);
+  };
+  const closeCard = () => setActiveIdx(null);
+
+  // close on Escape
+  useEffect(() => {
+    if (activeIdx === null) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeCard();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [activeIdx]);
+
+  // first auto-play after mount, once images decode
   useEffect(() => {
     let cancelled = false;
     const els = cardsRef.current.filter(Boolean) as HTMLDivElement[];
-    // preload images so the first reveal looks polished
     Promise.all(
       PHOTOS.map(
         (p) =>
@@ -236,7 +343,6 @@ export default function App() {
       )
     ).then(() => {
       if (cancelled) return;
-      // hide before first paint so they don't flash at rest position
       els.forEach((el) => gsap.set(el, { opacity: 0 }));
       play();
     });
@@ -245,6 +351,8 @@ export default function App() {
     };
   }, [play]);
 
+  const active = activeIdx === null ? null : PHOTOS[activeIdx];
+
   return (
     <div className="stage relative w-full h-full">
       <div className="backdrop" />
@@ -252,7 +360,7 @@ export default function App() {
 
       <header className="header">
         <h1>Polaroid POC</h1>
-        <p>5 cards · flutter + tumble · GSAP physics</p>
+        <p>10 cards · pixar style · GSAP physics</p>
       </header>
 
       <div className="absolute inset-0 flex items-center justify-center">
@@ -262,6 +370,10 @@ export default function App() {
             ref={(el) => (cardsRef.current[i] = el)}
             className="polaroid"
             style={{ opacity: 0, zIndex: 10 + i }}
+            onClick={() => openCard(i)}
+            role="button"
+            tabIndex={0}
+            aria-label={`Открыть ${p.caption}`}
           >
             <div
               className="photo"
@@ -291,6 +403,32 @@ export default function App() {
         >
           ⬇ Drop
         </button>
+      </div>
+
+      <div
+        className={`detail-overlay ${active ? "is-open" : ""}`}
+        onClick={closeCard}
+      >
+        {active && (
+          <div className="detail-card" onClick={(e) => e.stopPropagation()}>
+            <button
+              className="detail-close"
+              onClick={closeCard}
+              aria-label="Закрыть"
+            >
+              ×
+            </button>
+            <div
+              className="detail-photo"
+              style={{ backgroundImage: `url("${active.src}")` }}
+              role="img"
+              aria-label={active.caption}
+            />
+            <h2 className="detail-title">{active.caption}</h2>
+            <div className="detail-sub">{active.region}</div>
+            <p className="detail-text">{active.description}</p>
+          </div>
+        )}
       </div>
     </div>
   );
