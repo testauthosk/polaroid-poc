@@ -229,99 +229,119 @@ export default function App() {
       if (!el) return;
       el.style.willChange = "transform";
 
-      // direction of approach — used to bias overshoot/squash
-      const dx = p.startOffsetX;
-      const dy = p.startOffsetY;
+      const startX = p.restX + p.startOffsetX;
+      const startY = p.restY + p.startOffsetY;
+      const dx = p.restX - startX;
+      const dy = p.restY - startY;
       const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-      const nx = dx / dist;
-      const ny = dy / dist;
-      // overshoot positions: card flies PAST rest, then elastic-pulls back
-      const overshootDist = 24 + Math.random() * 12;
-      const overX = p.restX + (-nx) * overshootDist;
-      const overY = p.restY + (-ny) * overshootDist;
-      // mid-flight rotation overspin — card does an extra half-turn before settling
-      const spinDir = Math.sign(p.restRotZ - p.startRotZ) || 1;
-      const overRotZ = p.restRotZ + spinDir * (18 + Math.random() * 10);
-      // jitter for natural per-card character
-      const wobbleAmp = 4 + Math.random() * 3;
+      // perpendicular to motion vector — used to bend the path into a real arc
+      const perpX = -dy / dist;
+      const perpY = dx / dist;
+      const bendSign = Math.random() > 0.5 ? 1 : -1;
+      const arcAmp = 0.22 + Math.random() * 0.18; // 22-40% of flight distance
+      // first control: 33% along + perp lift
+      const c1x = startX + dx * 0.33 + perpX * dist * arcAmp * bendSign;
+      const c1y = startY + dy * 0.33 + perpY * dist * arcAmp * bendSign;
+      // second control: 70% along + perp ease-back
+      const c2x = startX + dx * 0.7 + perpX * dist * arcAmp * 0.55 * bendSign;
+      const c2y = startY + dy * 0.7 + perpY * dist * arcAmp * 0.55 * bendSign;
+
+      // total tumble: from startRotZ → restRotZ over full duration, plus drift turns
+      const driftTurns = (Math.random() > 0.5 ? 1 : -1) * (0.4 + Math.random() * 0.5);
+      const finalRotZ = p.restRotZ + driftTurns * 360;
+
+      const flightDur = 1.55 + Math.random() * 0.25;
 
       gsap.set(el, {
-        x: p.restX + p.startOffsetX,
-        y: p.restY + p.startOffsetY,
-        z: 600,
+        x: startX,
+        y: startY,
+        z: 500,
         rotationZ: p.startRotZ,
-        rotationX: 30,
-        rotationY: -25,
-        scaleX: 1.3,
-        scaleY: 1.1,
+        rotationX: 24,
+        rotationY: -18,
+        scale: 1.18,
         opacity: 0,
       });
 
-      // fade in mid-flight
-      tl.to(el, { opacity: 1, duration: 0.14, ease: "power1.out" }, p.delay);
+      // fade in
+      tl.to(el, { opacity: 1, duration: 0.18, ease: "power1.out" }, p.delay);
 
-      // Phase A — hero-flight to OVERSHOOT pos + OVERSPIN rot. Power3.out = fast decel.
-      // Squash-stretch: card stretches along motion vector (scaleY bigger as it leans into flight)
-      tl.to(
-        el,
-        {
-          x: overX,
-          y: overY,
-          z: 60,
-          rotationZ: overRotZ,
-          rotationX: p.restRotX - 8,
-          rotationY: p.restRotY + 6,
-          scaleX: 0.96,
-          scaleY: 1.08,
-          ease: "power3.out",
-          duration: 0.62,
-        },
-        p.delay + 0.02
-      );
-
-      // Phase B — elastic settle to rest. This is where "the bounce" lives.
-      // elastic.out(amplitude, period): amp = how far it overshoots, period = osc duration.
-      tl.to(
-        el,
-        {
-          x: p.restX,
-          y: p.restY,
-          z: 0,
-          rotationZ: p.restRotZ,
-          rotationX: p.restRotX,
-          rotationY: p.restRotY,
-          scaleX: 1.0,
-          scaleY: 1.0,
-          ease: "elastic.out(1.05, 0.42)",
-          duration: 1.05,
-        },
-        p.delay + 0.62
-      );
-
-      // landing impact — micro squash on touchdown + elastic decay
+      // Position — 3-point arc via keyframes. sine.inOut between points smooths the curve.
+      // The card swoops along a real curve, not a straight line.
       tl.to(
         el,
         {
           keyframes: [
-            { scaleX: 1.14, scaleY: 0.86, duration: 0.09, ease: "power2.out" },
-            { scaleX: 0.97, scaleY: 1.05, duration: 0.13, ease: "power2.inOut" },
-            { scaleX: 1.0, scaleY: 1.0, duration: 0.32, ease: "elastic.out(1.2, 0.38)" },
+            { x: c1x, y: c1y, ease: "sine.inOut" },
+            { x: c2x, y: c2y, ease: "sine.inOut" },
+            { x: p.restX, y: p.restY, ease: "sine.out" },
           ],
+          duration: flightDur,
         },
-        p.delay + 0.58
+        p.delay
       );
 
-      // mid-flight tilt-wobble — keeps card feeling alive, not on a rail
+      // Z-depth + scale settle — slow continuous, no overshoot
       tl.to(
         el,
         {
-          rotationY: `+=${wobbleAmp}`,
-          duration: 0.28,
-          yoyo: true,
-          repeat: 1,
-          ease: "sine.inOut",
+          z: 0,
+          scale: 1.0,
+          ease: "power2.out",
+          duration: flightDur,
         },
-        p.delay + 0.18
+        p.delay
+      );
+
+      // Tumble — single continuous slow rotation across whole flight. NO overshoot.
+      // power1.out gives mild deceleration (air drag feeling).
+      tl.to(
+        el,
+        {
+          rotationZ: finalRotZ,
+          ease: "power1.out",
+          duration: flightDur,
+        },
+        p.delay
+      );
+      // gentle snap to clean rest angle after flight
+      tl.to(
+        el,
+        {
+          rotationZ: p.restRotZ,
+          ease: "sine.out",
+          duration: 0.35,
+        },
+        p.delay + flightDur
+      );
+
+      // X-axis tilt (forward/back lean) — smooth ease into rest
+      tl.to(
+        el,
+        {
+          rotationX: p.restRotX,
+          ease: "sine.out",
+          duration: flightDur,
+        },
+        p.delay
+      );
+
+      // Y-axis flutter — paper rocking in air. One tween with keyframes (no overlap chaos).
+      // Card sways left-right while flying, then settles. This is THE "leaf in wind" move.
+      const swayAmp = 6 + Math.random() * 4;
+      const swaySign = Math.random() > 0.5 ? 1 : -1;
+      tl.to(
+        el,
+        {
+          keyframes: [
+            { rotationY: swayAmp * swaySign, ease: "sine.inOut" },
+            { rotationY: -swayAmp * 0.7 * swaySign, ease: "sine.inOut" },
+            { rotationY: swayAmp * 0.4 * swaySign, ease: "sine.inOut" },
+            { rotationY: p.restRotY, ease: "sine.out" },
+          ],
+          duration: flightDur + 0.2,
+        },
+        p.delay
       );
     });
 
