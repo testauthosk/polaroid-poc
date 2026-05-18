@@ -132,26 +132,26 @@ body,
 
 .clip {
   position: absolute;
-  top: -4px;
+  top: -3px;
   left: 50%;
   transform: translateX(-50%);
-  width: 18px;
-  height: 26px;
+  width: 14px;
+  height: 20px;
   z-index: 3;
   filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3));
 }
 
 .polaroid {
-  width: 160px;
+  width: 112px;
   aspect-ratio: 4 / 5;
   background: var(--paper);
-  padding: 10px 10px 40px 10px;
-  border-radius: 6px;
-  border: 2px solid var(--paper-rim);
-  box-shadow: 0 2px 0 var(--paper-rim), 0 6px 14px var(--warm-shadow-soft),
-    0 14px 26px var(--warm-shadow);
+  padding: 7px 7px 28px 7px;
+  border-radius: 5px;
+  border: 1.5px solid var(--paper-rim);
+  box-shadow: 0 1.5px 0 var(--paper-rim), 0 4px 10px var(--warm-shadow-soft),
+    0 10px 20px var(--warm-shadow);
   position: absolute;
-  top: 14px; /* hangs below the clip */
+  top: 12px;
   left: 50%;
   transform: translateX(-50%);
   user-select: none;
@@ -188,11 +188,11 @@ body,
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 10px;
+  bottom: 7px;
   text-align: center;
   font-family: "Caveat", "Patrick Hand", cursive;
   font-weight: 700;
-  font-size: 22px;
+  font-size: 16px;
   line-height: 1;
   color: var(--ink);
   letter-spacing: 0.02em;

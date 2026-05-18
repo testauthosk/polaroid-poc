@@ -133,9 +133,9 @@ export default function App() {
   }, []);
 
   // rope geometry
-  const ropePad = 50; // distance from edges
+  const ropePad = 75; // distance from edges (slightly inside pulley center)
   const ropeBaseY = viewport.h * 0.34;
-  const ropeSag = Math.min(80, viewport.w * 0.06);
+  const ropeSag = Math.min(60, viewport.w * 0.05);
   const x0 = ropePad;
   const x1 = viewport.w - ropePad;
 
@@ -209,8 +209,12 @@ export default function App() {
       // We'll animate `x` via GSAP (relative to base position set by inline style).
       gsap.set(el, {
         x: viewport.w - target.x + 200, // off-screen right
+        y: 0, // RESET after Drop pushed cards below viewport
         xPercent: -50, // centers anchor on rope point (replaces inline translateX(-50%))
         rotationZ: p.hangRotZ - 12, // pre-swing (will settle to base)
+        rotationX: 0,
+        rotationY: 0,
+        scale: 1,
         opacity: 0,
       });
 
