@@ -159,6 +159,33 @@ body,
   cursor: pointer;
 }
 
+@media (max-width: 767px) {
+  .polaroid {
+    width: 88px;
+    padding: 5px 5px 22px 5px;
+    top: 9px;
+  }
+  .polaroid .caption {
+    font-size: 13px;
+    bottom: 5px;
+  }
+  .clip {
+    width: 11px;
+    height: 16px;
+    top: -2px;
+  }
+  .pulley {
+    width: 64px;
+    height: 64px;
+  }
+  .pulley.pulley-l {
+    left: -16px;
+  }
+  .pulley.pulley-r {
+    right: -16px;
+  }
+}
+
 .polaroid::after {
   content: "";
   position: absolute;

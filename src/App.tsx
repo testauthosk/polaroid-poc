@@ -44,7 +44,7 @@ const PHOTOS: CardData[] = [
     hangRotZ: 4,
   },
   {
-    src: "https://images.unsplash.com/photo-1583161181100-6dd2403fa44d?w=800&q=80&auto=format&fit=crop",
+    src: "https://images.unsplash.com/photo-1493606278519-11aa9f86e40a?w=800&q=80&auto=format&fit=crop",
     caption: "Hurghada",
     region: "Хургада",
     description:
@@ -68,7 +68,7 @@ const PHOTOS: CardData[] = [
     hangRotZ: -3,
   },
   {
-    src: "https://images.unsplash.com/photo-1591375372226-1be9efe43d4f?w=800&q=80&auto=format&fit=crop",
+    src: "https://images.unsplash.com/photo-1565967511849-76a60a516170?w=800&q=80&auto=format&fit=crop",
     caption: "Alex",
     region: "Александрия",
     description:
@@ -76,7 +76,7 @@ const PHOTOS: CardData[] = [
     hangRotZ: 2,
   },
   {
-    src: "https://images.unsplash.com/photo-1471919743851-c4df8b6ee133?w=800&q=80&auto=format&fit=crop",
+    src: "https://images.unsplash.com/photo-1503177119275-0aa32b3a9368?w=800&q=80&auto=format&fit=crop",
     caption: "Marsa",
     region: "Марса-Алам",
     description:
@@ -84,7 +84,7 @@ const PHOTOS: CardData[] = [
     hangRotZ: -2,
   },
   {
-    src: "https://images.unsplash.com/photo-1601553267932-1cd2a6c75ba8?w=800&q=80&auto=format&fit=crop",
+    src: "https://images.unsplash.com/photo-1542401886-65d6c61db217?w=800&q=80&auto=format&fit=crop",
     caption: "Siwa",
     region: "Оазис Сива",
     description:
@@ -114,6 +114,49 @@ function ropeSlopeAt(x: number, x0: number, x1: number, sag: number) {
   return Math.atan(dyDx) * (180 / Math.PI); // degrees
 }
 
+function Pulley({ side, spinning }: { side: "l" | "r"; spinning: boolean }) {
+  return (
+    <svg viewBox="0 0 100 100" aria-hidden="true">
+      <circle cx="50" cy="50" r="42" fill="#a87234" stroke="#3d2613" strokeWidth="3" />
+      <circle cx="50" cy="50" r="36" fill="#8a5b2a" />
+      <circle cx="50" cy="50" r="9" fill="#3d2613" />
+      <circle cx="50" cy="50" r="4" fill="#8a5b2a" />
+      {[0, 60, 120, 180, 240, 300].map((a) => (
+        <line
+          key={a}
+          x1="50"
+          y1="50"
+          x2={50 + 32 * Math.cos((a * Math.PI) / 180)}
+          y2={50 + 32 * Math.sin((a * Math.PI) / 180)}
+          stroke="#3d2613"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+        />
+      ))}
+      <circle cx="50" cy="50" r="2" fill="#1a1006" />
+    </svg>
+  );
+}
+
+function PulleyPair({ top, spinning }: { top: number; spinning: boolean }) {
+  return (
+    <>
+      <div
+        className={`pulley pulley-l ${spinning ? "is-spinning" : ""}`}
+        style={{ top }}
+      >
+        <Pulley side="l" spinning={spinning} />
+      </div>
+      <div
+        className={`pulley pulley-r ${spinning ? "is-spinning" : ""}`}
+        style={{ top }}
+      >
+        <Pulley side="r" spinning={spinning} />
+      </div>
+    </>
+  );
+}
+
 export default function App() {
   const stationsRef = useRef<(HTMLDivElement | null)[]>([]);
   const tlRef = useRef<gsap.core.Timeline | null>(null);
@@ -132,30 +175,42 @@ export default function App() {
     return () => window.removeEventListener("resize", m);
   }, []);
 
-  // rope geometry
-  const ropePad = 75; // distance from edges (slightly inside pulley center)
-  const ropeBaseY = viewport.h * 0.34;
+  // Responsive: on narrow viewports split into 2 ropes (5 cards each).
+  // Otherwise one wide rope with all 10.
+  const isMobile = viewport.w < 768;
+  const ropePad = 70;
   const ropeSag = Math.min(60, viewport.w * 0.05);
   const x0 = ropePad;
-  const x1 = viewport.w - ropePad;
+  const x1 = Math.max(viewport.w - ropePad, ropePad + 200);
 
-  // SVG path for rope (sin-curve approximation, mirrored)
-  const buildRopePath = () => {
+  type RopeRow = { indices: number[]; baseY: number };
+  const ropeRows: RopeRow[] = isMobile
+    ? [
+        { indices: [0, 1, 2, 3, 4], baseY: viewport.h * 0.22 },
+        { indices: [5, 6, 7, 8, 9], baseY: viewport.h * 0.52 },
+      ]
+    : [{ indices: PHOTOS.map((_, i) => i), baseY: viewport.h * 0.34 }];
+
+  // build SVG path for one rope
+  const buildRopePath = (baseY: number) => {
     const steps = 24;
-    const pts: string[] = [`M ${x0} ${ropeBaseY}`];
+    const pts: string[] = [`M ${x0} ${baseY}`];
     for (let i = 1; i <= steps; i++) {
       const x = x0 + ((x1 - x0) * i) / steps;
-      const y = ropeYAt(x, x0, x1, ropeBaseY, ropeSag);
+      const y = ropeYAt(x, x0, x1, baseY, ropeSag);
       pts.push(`L ${x.toFixed(1)} ${y.toFixed(1)}`);
     }
     return pts.join(" ");
   };
 
-  // card positions evenly spaced along rope
-  const cardPositions = PHOTOS.map((_, i) => {
-    const t = (i + 1) / (PHOTOS.length + 1);
+  // card positions on whichever rope row each card belongs to
+  const cardPositions = PHOTOS.map((_, idx) => {
+    // find which rope row holds this card
+    const row = ropeRows.find((r) => r.indices.includes(idx))!;
+    const positionInRow = row.indices.indexOf(idx);
+    const t = (positionInRow + 1) / (row.indices.length + 1);
     const x = x0 + (x1 - x0) * t;
-    const y = ropeYAt(x, x0, x1, ropeBaseY, ropeSag);
+    const y = ropeYAt(x, x0, x1, row.baseY, ropeSag);
     const slope = ropeSlopeAt(x, x0, x1, ropeSag);
     return { x, y, slope };
   });
@@ -339,10 +394,6 @@ export default function App() {
 
   const active = activeIdx === null ? null : PHOTOS[activeIdx];
 
-  // pulley vertical anchor — aligned with rope edge
-  const pulleyTopL = ropeBaseY - 45;
-  const pulleyTopR = ropeBaseY - 45;
-
   return (
     <div className="stage relative w-full h-full">
       <div className="backdrop" />
@@ -352,72 +403,30 @@ export default function App() {
         <p>clothesline · pulleys · 10 cards · GSAP</p>
       </header>
 
-      {/* rope SVG */}
+      {/* ropes — one per row */}
       <div className="rope-stage">
         <svg
           className="rope-svg"
           viewBox={`0 0 ${viewport.w} ${viewport.h}`}
           preserveAspectRatio="none"
         >
-          <path className="rope-path-shadow" d={buildRopePath()} />
-          <path ref={ropePathRef} className="rope-path" d={buildRopePath()} />
+          {ropeRows.map((row, idx) => (
+            <g key={idx}>
+              <path className="rope-path-shadow" d={buildRopePath(row.baseY)} />
+              <path className="rope-path" d={buildRopePath(row.baseY)} />
+            </g>
+          ))}
         </svg>
       </div>
 
-      {/* pulleys */}
-      <div
-        className={`pulley pulley-l ${pulleysSpinning ? "is-spinning" : ""}`}
-        style={{ top: pulleyTopL }}
-      >
-        <svg viewBox="0 0 100 100">
-          {/* outer disc */}
-          <circle cx="50" cy="50" r="42" fill="#a87234" stroke="#3d2613" strokeWidth="3" />
-          <circle cx="50" cy="50" r="36" fill="#8a5b2a" />
-          {/* inner hub */}
-          <circle cx="50" cy="50" r="9" fill="#3d2613" />
-          <circle cx="50" cy="50" r="4" fill="#8a5b2a" />
-          {/* spokes */}
-          {[0, 60, 120, 180, 240, 300].map((a) => (
-            <line
-              key={a}
-              x1="50"
-              y1="50"
-              x2={50 + 32 * Math.cos((a * Math.PI) / 180)}
-              y2={50 + 32 * Math.sin((a * Math.PI) / 180)}
-              stroke="#3d2613"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-            />
-          ))}
-          {/* axle bolts */}
-          <circle cx="50" cy="50" r="2" fill="#1a1006" />
-        </svg>
-      </div>
-
-      <div
-        className={`pulley pulley-r ${pulleysSpinning ? "is-spinning" : ""}`}
-        style={{ top: pulleyTopR }}
-      >
-        <svg viewBox="0 0 100 100">
-          <circle cx="50" cy="50" r="42" fill="#a87234" stroke="#3d2613" strokeWidth="3" />
-          <circle cx="50" cy="50" r="36" fill="#8a5b2a" />
-          <circle cx="50" cy="50" r="9" fill="#3d2613" />
-          <circle cx="50" cy="50" r="4" fill="#8a5b2a" />
-          {[0, 60, 120, 180, 240, 300].map((a) => (
-            <line
-              key={a}
-              x1="50"
-              y1="50"
-              x2={50 + 32 * Math.cos((a * Math.PI) / 180)}
-              y2={50 + 32 * Math.sin((a * Math.PI) / 180)}
-              stroke="#3d2613"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-            />
-          ))}
-          <circle cx="50" cy="50" r="2" fill="#1a1006" />
-        </svg>
-      </div>
+      {/* pulleys — pair per rope row */}
+      {ropeRows.map((row, idx) => (
+        <PulleyPair
+          key={idx}
+          top={row.baseY - (isMobile ? 32 : 45)}
+          spinning={pulleysSpinning}
+        />
+      ))}
 
       {/* hanging stations — anchors at rope, cards dangle from clip */}
       {PHOTOS.map((p, i) => {
