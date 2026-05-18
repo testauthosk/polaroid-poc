@@ -3,7 +3,6 @@
 @tailwind utilities;
 
 :root {
-  /* warm scrapbook palette */
   --stage-bg: #f6e9cf;
   --stage-bg-deep: #ecd7af;
   --stage-bg-shadow: #c9a86d;
@@ -13,6 +12,10 @@
   --accent: #d96416;
   --tape: #ffd874;
   --tape-edge: #d6a635;
+  --rope: #6b4626;
+  --rope-dark: #3d2613;
+  --clip-wood: #b07a3b;
+  --clip-wood-dark: #6e441b;
   --warm-shadow: rgba(124, 70, 22, 0.32);
   --warm-shadow-soft: rgba(124, 70, 22, 0.18);
 }
@@ -29,55 +32,133 @@ body,
   overflow: hidden;
 }
 
-/* 3D stage: parent gives perspective, children use preserve-3d */
+/* ─── Stage ────────────────────────────────────────────── */
 .stage {
   perspective: 1400px;
   perspective-origin: 50% 40%;
 }
 
-/* ─── Pixar-style polaroid ──────────────────────────────── */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at 50% 35%,
+    var(--stage-bg) 0%,
+    var(--stage-bg-deep) 60%,
+    var(--stage-bg-shadow) 100%
+  );
+  pointer-events: none;
+}
+
+/* ─── Rope / clothesline ───────────────────────────────── */
+.rope-stage {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.rope-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* the actual rope path */
+.rope-path {
+  fill: none;
+  stroke: var(--rope);
+  stroke-width: 5;
+  stroke-linecap: round;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.25));
+}
+.rope-path-shadow {
+  fill: none;
+  stroke: var(--rope-dark);
+  stroke-width: 5.5;
+  stroke-linecap: round;
+  transform: translateY(2px);
+  opacity: 0.4;
+}
+
+/* ─── Pulley ───────────────────────────────────────────── */
+.pulley {
+  position: fixed;
+  width: 90px;
+  height: 90px;
+  z-index: 6;
+  pointer-events: none;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+.pulley.pulley-l {
+  left: -20px;
+  /* exact top is set dynamically to align with rope */
+}
+.pulley.pulley-r {
+  right: -20px;
+}
+
+.pulley svg {
+  width: 100%;
+  height: 100%;
+  /* animation is controlled via animation-play-state from JS */
+  animation: pulley-spin 1.4s linear infinite paused;
+}
+.pulley.pulley-r svg {
+  animation-direction: reverse;
+}
+
+.pulley.is-spinning svg {
+  animation-play-state: running;
+}
+
+@keyframes pulley-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ─── Polaroid (hanging-style) ─────────────────────────── */
+.hangstation {
+  /* anchor that holds the card+clip — positioned by JS along the rope */
+  position: fixed;
+  /* top set by JS = rope y at that x */
+  transform-origin: 50% 0;
+  z-index: 10;
+  /* card is offset down from anchor (under the clip) */
+  will-change: transform;
+}
+
+.clip {
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 18px;
+  height: 26px;
+  z-index: 3;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3));
+}
+
 .polaroid {
   width: 160px;
   aspect-ratio: 4 / 5;
   background: var(--paper);
   padding: 10px 10px 40px 10px;
   border-radius: 6px;
-  /* cel-shading outline + sticker bottom-rim + warm soft shadow */
   border: 2px solid var(--paper-rim);
-  box-shadow:
-    0 2px 0 var(--paper-rim),
-    0 6px 14px var(--warm-shadow-soft),
+  box-shadow: 0 2px 0 var(--paper-rim), 0 6px 14px var(--warm-shadow-soft),
     0 14px 26px var(--warm-shadow);
-  transform-style: preserve-3d;
-  backface-visibility: hidden;
   position: absolute;
-  top: 50%;
+  top: 14px; /* hangs below the clip */
   left: 50%;
-  transform: translate3d(-50%, -50%, 0);
-  will-change: transform;
+  transform: translateX(-50%);
   user-select: none;
   -webkit-user-select: none;
   cursor: pointer;
 }
 
-/* washi-tape strip on top */
-.polaroid::before {
-  content: "";
-  position: absolute;
-  top: -10px;
-  left: 50%;
-  transform: translateX(-50%) rotate(-4deg);
-  width: 64px;
-  height: 18px;
-  background: linear-gradient(180deg, var(--tape) 0%, var(--tape-edge) 100%);
-  border-left: 1px dashed rgba(0, 0, 0, 0.18);
-  border-right: 1px dashed rgba(0, 0, 0, 0.18);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
-  pointer-events: none;
-  z-index: 2;
-}
-
-/* faint paper grain inside frame */
 .polaroid::after {
   content: "";
   position: absolute;
@@ -99,10 +180,8 @@ body,
   background-size: cover;
   background-position: center;
   display: block;
-  /* cartoon-bump + recessed inner */
   filter: saturate(1.18) contrast(1.06);
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.18);
-  position: relative;
 }
 
 .polaroid .caption {
@@ -118,7 +197,6 @@ body,
   color: var(--ink);
   letter-spacing: 0.02em;
   pointer-events: none;
-  z-index: 2;
 }
 
 /* ─── Controls ─────────────────────────────────────────── */
@@ -192,27 +270,7 @@ body,
   text-transform: uppercase;
 }
 
-/* ─── Backdrop & floor shadow ──────────────────────────── */
-.backdrop {
-  position: fixed;
-  inset: 0;
-  background:
-    radial-gradient(ellipse at 50% 40%, var(--stage-bg) 0%, var(--stage-bg-deep) 60%, var(--stage-bg-shadow) 100%);
-  pointer-events: none;
-}
-.floor {
-  position: fixed;
-  left: 50%;
-  bottom: 18%;
-  transform: translateX(-50%);
-  width: min(820px, 84vw);
-  height: 70px;
-  background: radial-gradient(ellipse at center, rgba(80, 40, 10, 0.18) 0%, transparent 70%);
-  filter: blur(2px);
-  pointer-events: none;
-}
-
-/* ─── Detail card modal ────────────────────────────────── */
+/* ─── Detail modal ─────────────────────────────────────── */
 .detail-overlay {
   position: fixed;
   inset: 0;
@@ -240,9 +298,7 @@ body,
   border: 2px solid var(--paper-rim);
   border-radius: 10px;
   padding: 16px 16px 24px;
-  box-shadow:
-    0 4px 0 var(--paper-rim),
-    0 24px 50px rgba(40, 18, 4, 0.45);
+  box-shadow: 0 4px 0 var(--paper-rim), 0 24px 50px rgba(40, 18, 4, 0.45);
   transform: scale(0.9) translateY(20px) rotate(-1deg);
   opacity: 0;
   transition: transform 360ms cubic-bezier(0.2, 1.3, 0.4, 1.05), opacity 280ms;

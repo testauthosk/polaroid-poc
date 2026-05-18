@@ -6,19 +6,8 @@ type CardData = {
   caption: string;
   region: string;
   description: string;
-  /** rest position relative to viewport center: x in px, y in px */
-  restX: number;
-  restY: number;
-  /** rest rotations in degrees */
-  restRotZ: number;
-  restRotX: number;
-  restRotY: number;
-  /** start offset from rest pos */
-  startOffsetX: number;
-  startOffsetY: number;
-  startRotZ: number;
-  /** stagger order */
-  delay: number;
+  /** baseline tilt at rest (deg) */
+  hangRotZ: number;
 };
 
 const PHOTOS: CardData[] = [
@@ -28,15 +17,7 @@ const PHOTOS: CardData[] = [
     region: "Каир · столица",
     description:
       "Город минаретов и шумных базаров. Хан эль-Халили торгует пряностями уже 700 лет, а сабиль на горизонте подсвечивается на закате.",
-    restX: -320,
-    restY: -90,
-    restRotZ: -7,
-    restRotX: 5,
-    restRotY: -3,
-    startOffsetX: -1000,
-    startOffsetY: -600,
-    startRotZ: -180,
-    delay: 0.0,
+    hangRotZ: -3,
   },
   {
     src: "https://images.unsplash.com/photo-1568322445389-f64ac2515020?w=800&q=80&auto=format&fit=crop",
@@ -44,15 +25,7 @@ const PHOTOS: CardData[] = [
     region: "Пирамиды Гизы",
     description:
       "Последнее из семи чудес света, до сих пор стоящее. Хеопс, Хефрен, Микерин и Сфинкс на одном плато за 30 минут от центра Каира.",
-    restX: -170,
-    restY: 70,
-    restRotZ: 5,
-    restRotX: -4,
-    restRotY: 3,
-    startOffsetX: 900,
-    startOffsetY: -700,
-    startRotZ: 220,
-    delay: 0.1,
+    hangRotZ: 2,
   },
   {
     src: "https://images.unsplash.com/photo-1505761671935-60b3a7427bad?w=800&q=80&auto=format&fit=crop",
@@ -60,15 +33,7 @@ const PHOTOS: CardData[] = [
     region: "Шарм-эль-Шейх",
     description:
       "Курорт Красного моря с коралловыми рифами Рас-Мохаммеда. Дайвинг, гольф, all-inclusive и закаты над Тиранским проливом.",
-    restX: 0,
-    restY: -130,
-    restRotZ: -3,
-    restRotX: 4,
-    restRotY: -2,
-    startOffsetX: 0,
-    startOffsetY: -1000,
-    startRotZ: -90,
-    delay: 0.2,
+    hangRotZ: -2,
   },
   {
     src: "https://images.unsplash.com/photo-1572252009286-268acec5ca0a?w=800&q=80&auto=format&fit=crop",
@@ -76,15 +41,7 @@ const PHOTOS: CardData[] = [
     region: "Луксор · древние Фивы",
     description:
       "Карнакский храмовый комплекс, Долина царей, гробница Тутанхамона. Воздушный шар на рассвете над западным берегом Нила.",
-    restX: 170,
-    restY: 70,
-    restRotZ: 8,
-    restRotX: -5,
-    restRotY: 4,
-    startOffsetX: 1100,
-    startOffsetY: 200,
-    startRotZ: 260,
-    delay: 0.3,
+    hangRotZ: 4,
   },
   {
     src: "https://images.unsplash.com/photo-1583161181100-6dd2403fa44d?w=800&q=80&auto=format&fit=crop",
@@ -92,15 +49,7 @@ const PHOTOS: CardData[] = [
     region: "Хургада",
     description:
       "Песчаные пляжи и ветреные кайт-споты. Стартовая точка для дайв-сафари на южные рифы и острова Гифтун.",
-    restX: 320,
-    restY: -50,
-    restRotZ: -5,
-    restRotX: 3,
-    restRotY: -1,
-    startOffsetX: -800,
-    startOffsetY: 800,
-    startRotZ: -270,
-    delay: 0.4,
+    hangRotZ: -4,
   },
   {
     src: "https://images.unsplash.com/photo-1518684079-3c830dcef090?w=800&q=80&auto=format&fit=crop",
@@ -108,15 +57,7 @@ const PHOTOS: CardData[] = [
     region: "Дахаб · Синай",
     description:
       "Расслабленный синайский курорт у Голубой дыры — легендарного дайв-сайта на 100+ метров. Бедуинские кафе на берегу, кайт и сноркл.",
-    restX: -240,
-    restY: 140,
-    restRotZ: 6,
-    restRotX: -3,
-    restRotY: 5,
-    startOffsetX: -1100,
-    startOffsetY: 600,
-    startRotZ: 200,
-    delay: 0.5,
+    hangRotZ: 3,
   },
   {
     src: "https://images.unsplash.com/photo-1610116306796-6fea9f4fae38?w=800&q=80&auto=format&fit=crop",
@@ -124,15 +65,7 @@ const PHOTOS: CardData[] = [
     region: "Асуан · нубийский юг",
     description:
       "Фелюки под белым парусом по Нилу, Высотная плотина, остров Элефантина и храм Филе. Самый спокойный город на Ниле.",
-    restX: 240,
-    restY: 160,
-    restRotZ: -6,
-    restRotX: 4,
-    restRotY: -3,
-    startOffsetX: 1000,
-    startOffsetY: -300,
-    startRotZ: -240,
-    delay: 0.6,
+    hangRotZ: -3,
   },
   {
     src: "https://images.unsplash.com/photo-1591375372226-1be9efe43d4f?w=800&q=80&auto=format&fit=crop",
@@ -140,31 +73,15 @@ const PHOTOS: CardData[] = [
     region: "Александрия",
     description:
       "Средиземноморский порт, основанный Александром Македонским. Современная Bibliotheca Alexandrina и катакомбы Ком-эль-Шукафа.",
-    restX: -90,
-    restY: -220,
-    restRotZ: 4,
-    restRotX: -2,
-    restRotY: 2,
-    startOffsetX: -700,
-    startOffsetY: -900,
-    startRotZ: 160,
-    delay: 0.7,
+    hangRotZ: 2,
   },
   {
     src: "https://images.unsplash.com/photo-1471919743851-c4df8b6ee133?w=800&q=80&auto=format&fit=crop",
-    caption: "Marsa Alam",
+    caption: "Marsa",
     region: "Марса-Алам",
     description:
       "Нетронутые рифы, дюгони в бухте Абу-Дабаб, тихие пляжи без толп. Долететь сложнее, но дайвинг лучший в Египте.",
-    restX: 100,
-    restY: 230,
-    restRotZ: 3,
-    restRotX: 5,
-    restRotY: -4,
-    startOffsetX: 800,
-    startOffsetY: 900,
-    startRotZ: -200,
-    delay: 0.8,
+    hangRotZ: -2,
   },
   {
     src: "https://images.unsplash.com/photo-1601553267932-1cd2a6c75ba8?w=800&q=80&auto=format&fit=crop",
@@ -172,24 +89,76 @@ const PHOTOS: CardData[] = [
     region: "Оазис Сива",
     description:
       "Берберская оазисная деревня в Западной пустыне, в 50 км от ливийской границы. Солёные озёра, источник Клеопатры и крепость Шали.",
-    restX: -380,
-    restY: 220,
-    restRotZ: -8,
-    restRotX: 3,
-    restRotY: 4,
-    startOffsetX: -1200,
-    startOffsetY: 200,
-    startRotZ: 300,
-    delay: 0.9,
+    hangRotZ: 4,
   },
 ];
 
+// Catenary curve y = a + b * cosh((x - cx) / b) approximated via parabola
+// For simplicity: y(x) = ropeBaseY + sag * (1 - cos(pi * (x - x0) / (x1 - x0))) / 2  — sine-shaped dip
+function ropeYAt(
+  x: number,
+  x0: number,
+  x1: number,
+  baseY: number,
+  sag: number
+) {
+  const t = (x - x0) / (x1 - x0);
+  // sin-curve dip — 0 at edges, sag at middle
+  return baseY + sag * Math.sin(Math.PI * t);
+}
+
+// Slope of the rope at x — used to tilt cards/clips so they look attached
+function ropeSlopeAt(x: number, x0: number, x1: number, sag: number) {
+  const t = (x - x0) / (x1 - x0);
+  const dyDx = sag * Math.PI * Math.cos(Math.PI * t) / (x1 - x0);
+  return Math.atan(dyDx) * (180 / Math.PI); // degrees
+}
+
 export default function App() {
-  const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const stationsRef = useRef<(HTMLDivElement | null)[]>([]);
   const tlRef = useRef<gsap.core.Timeline | null>(null);
   const idleRef = useRef<gsap.core.Tween[]>([]);
-  const [phase, setPhase] = useState<"ready" | "playing" | "rest">("ready");
+  const [phase, setPhase] = useState<"ready" | "running" | "rest">("ready");
   const [activeIdx, setActiveIdx] = useState<number | null>(null);
+  const [pulleysSpinning, setPulleysSpinning] = useState(false);
+  const [viewport, setViewport] = useState({ w: 1200, h: 800 });
+  const ropePathRef = useRef<SVGPathElement>(null);
+
+  // measure viewport
+  useEffect(() => {
+    const m = () => setViewport({ w: window.innerWidth, h: window.innerHeight });
+    m();
+    window.addEventListener("resize", m);
+    return () => window.removeEventListener("resize", m);
+  }, []);
+
+  // rope geometry
+  const ropePad = 50; // distance from edges
+  const ropeBaseY = viewport.h * 0.34;
+  const ropeSag = Math.min(80, viewport.w * 0.06);
+  const x0 = ropePad;
+  const x1 = viewport.w - ropePad;
+
+  // SVG path for rope (sin-curve approximation, mirrored)
+  const buildRopePath = () => {
+    const steps = 24;
+    const pts: string[] = [`M ${x0} ${ropeBaseY}`];
+    for (let i = 1; i <= steps; i++) {
+      const x = x0 + ((x1 - x0) * i) / steps;
+      const y = ropeYAt(x, x0, x1, ropeBaseY, ropeSag);
+      pts.push(`L ${x.toFixed(1)} ${y.toFixed(1)}`);
+    }
+    return pts.join(" ");
+  };
+
+  // card positions evenly spaced along rope
+  const cardPositions = PHOTOS.map((_, i) => {
+    const t = (i + 1) / (PHOTOS.length + 1);
+    const x = x0 + (x1 - x0) * t;
+    const y = ropeYAt(x, x0, x1, ropeBaseY, ropeSag);
+    const slope = ropeSlopeAt(x, x0, x1, ropeSag);
+    return { x, y, slope };
+  });
 
   const killIdle = () => {
     idleRef.current.forEach((t) => t.kill());
@@ -199,200 +168,133 @@ export default function App() {
   const play = useCallback(() => {
     tlRef.current?.kill();
     killIdle();
-    cardsRef.current.forEach((el) => {
+    stationsRef.current.forEach((el) => {
       if (el) gsap.killTweensOf(el);
     });
 
+    setPulleysSpinning(true);
+    setPhase("running");
+
     const tl = gsap.timeline({
       onComplete: () => {
+        setPulleysSpinning(false);
         setPhase("rest");
-        cardsRef.current.forEach((el, i) => {
+        // start gentle sway loop per card — each desynced
+        stationsRef.current.forEach((el, i) => {
           if (!el) return;
           el.style.willChange = "auto";
           const p = PHOTOS[i];
-          const wobble = gsap.to(el, {
-            rotationZ: p.restRotZ + (Math.random() > 0.5 ? 1.4 : -1.4),
-            rotationY: p.restRotY + (Math.random() > 0.5 ? 2.5 : -2.5),
-            duration: 2.4 + Math.random() * 1.0,
+          const amp = 1.6 + Math.random() * 1.2;
+          const dur = 2.6 + Math.random() * 1.2;
+          const sway = gsap.to(el, {
+            rotationZ: p.hangRotZ + (Math.random() > 0.5 ? amp : -amp),
+            duration: dur,
             ease: "sine.inOut",
             yoyo: true,
             repeat: -1,
-            delay: Math.random() * 0.8,
+            delay: Math.random() * 1.0,
           });
-          idleRef.current.push(wobble);
+          idleRef.current.push(sway);
         });
       },
     });
 
     PHOTOS.forEach((p, i) => {
-      const el = cardsRef.current[i];
+      const el = stationsRef.current[i];
       if (!el) return;
       el.style.willChange = "transform";
 
-      const startX = p.restX + p.startOffsetX;
-      const startY = p.restY + p.startOffsetY;
-      const dx = p.restX - startX;
-      const dy = p.restY - startY;
-      const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-      // perpendicular to motion vector — used to bend the path into a real arc
-      const perpX = -dy / dist;
-      const perpY = dx / dist;
-      const bendSign = Math.random() > 0.5 ? 1 : -1;
-      const arcAmp = 0.22 + Math.random() * 0.18; // 22-40% of flight distance
-      // first control: 33% along + perp lift
-      const c1x = startX + dx * 0.33 + perpX * dist * arcAmp * bendSign;
-      const c1y = startY + dy * 0.33 + perpY * dist * arcAmp * bendSign;
-      // second control: 70% along + perp ease-back
-      const c2x = startX + dx * 0.7 + perpX * dist * arcAmp * 0.55 * bendSign;
-      const c2y = startY + dy * 0.7 + perpY * dist * arcAmp * 0.55 * bendSign;
-
-      // total tumble: from startRotZ → restRotZ over full duration, plus drift turns
-      const driftTurns = (Math.random() > 0.5 ? 1 : -1) * (0.4 + Math.random() * 0.5);
-      const finalRotZ = p.restRotZ + driftTurns * 360;
-
-      const flightDur = 1.55 + Math.random() * 0.25;
-
+      const target = cardPositions[i];
+      // set anchor pivot at the rope point + start far off right
+      // We'll animate `x` via GSAP (relative to base position set by inline style).
       gsap.set(el, {
-        x: startX,
-        y: startY,
-        z: 500,
-        rotationZ: p.startRotZ,
-        rotationX: 24,
-        rotationY: -18,
-        scale: 1.18,
+        x: viewport.w - target.x + 200, // off-screen right
+        xPercent: -50, // centers anchor on rope point (replaces inline translateX(-50%))
+        rotationZ: p.hangRotZ - 12, // pre-swing (will settle to base)
         opacity: 0,
       });
 
-      // fade in
-      tl.to(el, { opacity: 1, duration: 0.18, ease: "power1.out" }, p.delay);
+      const stagger = i * 0.18; // 180ms between cards leaving the right pulley
 
-      // Position — 3-point arc via keyframes. sine.inOut between points smooths the curve.
-      // The card swoops along a real curve, not a straight line.
       tl.to(
         el,
-        {
-          keyframes: [
-            { x: c1x, y: c1y, ease: "sine.inOut" },
-            { x: c2x, y: c2y, ease: "sine.inOut" },
-            { x: p.restX, y: p.restY, ease: "sine.out" },
-          ],
-          duration: flightDur,
-        },
-        p.delay
+        { opacity: 1, duration: 0.2, ease: "power1.out" },
+        stagger
       );
 
-      // Z-depth + scale settle — slow continuous, no overshoot
+      // Slide left along the rope to its target. The motion is smooth deceleration
+      // (cards SLOW DOWN as they reach their slot, mimicking rope friction).
       tl.to(
         el,
         {
-          z: 0,
-          scale: 1.0,
+          x: 0,
           ease: "power2.out",
-          duration: flightDur,
+          duration: 1.4,
         },
-        p.delay
+        stagger
       );
 
-      // Tumble — single continuous slow rotation across whole flight. NO overshoot.
-      // power1.out gives mild deceleration (air drag feeling).
-      tl.to(
-        el,
-        {
-          rotationZ: finalRotZ,
-          ease: "power1.out",
-          duration: flightDur,
-        },
-        p.delay
-      );
-      // gentle snap to clean rest angle after flight
-      tl.to(
-        el,
-        {
-          rotationZ: p.restRotZ,
-          ease: "sine.out",
-          duration: 0.35,
-        },
-        p.delay + flightDur
-      );
-
-      // X-axis tilt (forward/back lean) — smooth ease into rest
-      tl.to(
-        el,
-        {
-          rotationX: p.restRotX,
-          ease: "sine.out",
-          duration: flightDur,
-        },
-        p.delay
-      );
-
-      // Y-axis flutter — paper rocking in air. One tween with keyframes (no overlap chaos).
-      // Card sways left-right while flying, then settles. This is THE "leaf in wind" move.
-      const swayAmp = 6 + Math.random() * 4;
-      const swaySign = Math.random() > 0.5 ? 1 : -1;
+      // Small swing dampening as the card lands — overshoots a touch, then settles.
+      // Subtle — we DON'T want bouncy elastic. Just a soft pendulum decay.
       tl.to(
         el,
         {
           keyframes: [
-            { rotationY: swayAmp * swaySign, ease: "sine.inOut" },
-            { rotationY: -swayAmp * 0.7 * swaySign, ease: "sine.inOut" },
-            { rotationY: swayAmp * 0.4 * swaySign, ease: "sine.inOut" },
-            { rotationY: p.restRotY, ease: "sine.out" },
+            { rotationZ: p.hangRotZ + 6, ease: "sine.inOut" },
+            { rotationZ: p.hangRotZ - 3, ease: "sine.inOut" },
+            { rotationZ: p.hangRotZ + 1.5, ease: "sine.inOut" },
+            { rotationZ: p.hangRotZ, ease: "sine.out" },
           ],
-          duration: flightDur + 0.2,
+          duration: 1.6,
         },
-        p.delay
+        stagger + 0.7
       );
     });
 
     tlRef.current = tl;
-    setPhase("playing");
-  }, []);
+  }, [viewport.w, viewport.h, cardPositions]);
 
   const drop = useCallback(() => {
     tlRef.current?.kill();
     killIdle();
-    cardsRef.current.forEach((el, i) => {
+    stationsRef.current.forEach((el, i) => {
       if (!el) return;
       gsap.killTweensOf(el);
       el.style.willChange = "transform";
       const dir = i % 2 === 0 ? 1 : -1;
-
+      const swayKick = (Math.random() > 0.5 ? 1 : -1) * (8 + Math.random() * 6);
       const fall = gsap.timeline({
         onComplete: () => {
           if (el) el.style.willChange = "auto";
         },
       });
-      // lift, then fall — flutter-tumble per OSINT (lift via rot↔vy coupling)
+      // small clip-release kick — tilt then fall
+      fall.to(
+        el,
+        {
+          rotationZ: `+=${swayKick}`,
+          duration: 0.18,
+          ease: "power1.out",
+        },
+        i * 0.04
+      );
       fall.to(el, {
-        rotationZ: "+=" + 20 * dir,
-        rotationX: "-=10",
-        y: "-=40",
-        duration: 0.25,
-        ease: "power1.out",
-        delay: i * 0.04,
-      });
-      fall.to(el, {
-        y: window.innerHeight + 200,
-        rotationZ: "+=" + (180 + Math.random() * 180) * dir,
-        rotationX: "+=" + (60 + Math.random() * 40) * (Math.random() > 0.5 ? 1 : -1),
-        rotationY: "+=" + (40 + Math.random() * 30) * dir,
-        x: "+=" + (60 + Math.random() * 80) * dir,
-        duration: 1.4 + Math.random() * 0.4,
+        y: viewport.h + 240,
+        rotationZ: `+=${(180 + Math.random() * 180) * dir}`,
+        x: `+=${(40 + Math.random() * 100) * dir}`,
+        duration: 1.5 + Math.random() * 0.4,
         ease: "power2.in",
       });
     });
     setPhase("ready");
-  }, []);
+  }, [viewport.h]);
 
-  // click on a card → open modal, pause its idle wobble
   const openCard = (idx: number) => {
     if (phase !== "rest") return;
     setActiveIdx(idx);
   };
   const closeCard = () => setActiveIdx(null);
 
-  // close on Escape
   useEffect(() => {
     if (activeIdx === null) return;
     const onKey = (e: KeyboardEvent) => {
@@ -402,10 +304,10 @@ export default function App() {
     return () => window.removeEventListener("keydown", onKey);
   }, [activeIdx]);
 
-  // first auto-play after mount, once images decode
+  // autoplay after preload + initial viewport measured
   useEffect(() => {
     let cancelled = false;
-    const els = cardsRef.current.filter(Boolean) as HTMLDivElement[];
+    if (!viewport.w) return;
     Promise.all(
       PHOTOS.map(
         (p) =>
@@ -418,55 +320,151 @@ export default function App() {
       )
     ).then(() => {
       if (cancelled) return;
-      els.forEach((el) => gsap.set(el, { opacity: 0 }));
+      // ensure cards are hidden before timeline kicks in
+      stationsRef.current.forEach((el) => {
+        if (el) gsap.set(el, { opacity: 0 });
+      });
       play();
     });
     return () => {
       cancelled = true;
     };
-  }, [play]);
+    // play depends on cardPositions which depends on viewport; we only want to autoplay once on first measurement
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [viewport.w, viewport.h]);
 
   const active = activeIdx === null ? null : PHOTOS[activeIdx];
+
+  // pulley vertical anchor — aligned with rope edge
+  const pulleyTopL = ropeBaseY - 45;
+  const pulleyTopR = ropeBaseY - 45;
 
   return (
     <div className="stage relative w-full h-full">
       <div className="backdrop" />
-      <div className="floor" />
 
       <header className="header">
         <h1>Polaroid POC</h1>
-        <p>10 cards · pixar style · GSAP physics</p>
+        <p>clothesline · pulleys · 10 cards · GSAP</p>
       </header>
 
-      <div className="absolute inset-0 flex items-center justify-center">
-        {PHOTOS.map((p, i) => (
+      {/* rope SVG */}
+      <div className="rope-stage">
+        <svg
+          className="rope-svg"
+          viewBox={`0 0 ${viewport.w} ${viewport.h}`}
+          preserveAspectRatio="none"
+        >
+          <path className="rope-path-shadow" d={buildRopePath()} />
+          <path ref={ropePathRef} className="rope-path" d={buildRopePath()} />
+        </svg>
+      </div>
+
+      {/* pulleys */}
+      <div
+        className={`pulley pulley-l ${pulleysSpinning ? "is-spinning" : ""}`}
+        style={{ top: pulleyTopL }}
+      >
+        <svg viewBox="0 0 100 100">
+          {/* outer disc */}
+          <circle cx="50" cy="50" r="42" fill="#a87234" stroke="#3d2613" strokeWidth="3" />
+          <circle cx="50" cy="50" r="36" fill="#8a5b2a" />
+          {/* inner hub */}
+          <circle cx="50" cy="50" r="9" fill="#3d2613" />
+          <circle cx="50" cy="50" r="4" fill="#8a5b2a" />
+          {/* spokes */}
+          {[0, 60, 120, 180, 240, 300].map((a) => (
+            <line
+              key={a}
+              x1="50"
+              y1="50"
+              x2={50 + 32 * Math.cos((a * Math.PI) / 180)}
+              y2={50 + 32 * Math.sin((a * Math.PI) / 180)}
+              stroke="#3d2613"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+            />
+          ))}
+          {/* axle bolts */}
+          <circle cx="50" cy="50" r="2" fill="#1a1006" />
+        </svg>
+      </div>
+
+      <div
+        className={`pulley pulley-r ${pulleysSpinning ? "is-spinning" : ""}`}
+        style={{ top: pulleyTopR }}
+      >
+        <svg viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="42" fill="#a87234" stroke="#3d2613" strokeWidth="3" />
+          <circle cx="50" cy="50" r="36" fill="#8a5b2a" />
+          <circle cx="50" cy="50" r="9" fill="#3d2613" />
+          <circle cx="50" cy="50" r="4" fill="#8a5b2a" />
+          {[0, 60, 120, 180, 240, 300].map((a) => (
+            <line
+              key={a}
+              x1="50"
+              y1="50"
+              x2={50 + 32 * Math.cos((a * Math.PI) / 180)}
+              y2={50 + 32 * Math.sin((a * Math.PI) / 180)}
+              stroke="#3d2613"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+            />
+          ))}
+          <circle cx="50" cy="50" r="2" fill="#1a1006" />
+        </svg>
+      </div>
+
+      {/* hanging stations — anchors at rope, cards dangle from clip */}
+      {PHOTOS.map((p, i) => {
+        const pos = cardPositions[i];
+        return (
           <div
             key={i}
-            ref={(el) => (cardsRef.current[i] = el)}
-            className="polaroid"
-            style={{ opacity: 0, zIndex: 10 + i }}
-            onClick={() => openCard(i)}
-            role="button"
-            tabIndex={0}
-            aria-label={`Открыть ${p.caption}`}
+            ref={(el) => (stationsRef.current[i] = el)}
+            className="hangstation"
+            style={{
+              left: pos.x,
+              top: pos.y,
+              opacity: 0,
+              zIndex: 10 + i,
+            }}
           >
+            {/* clip — small wooden clothespin SVG */}
+            <svg className="clip" viewBox="0 0 18 26" aria-hidden="true">
+              {/* two halves */}
+              <rect x="2" y="0" width="6" height="22" rx="2" fill="var(--clip-wood)" stroke="var(--clip-wood-dark)" strokeWidth="1" />
+              <rect x="10" y="0" width="6" height="22" rx="2" fill="var(--clip-wood)" stroke="var(--clip-wood-dark)" strokeWidth="1" />
+              {/* spring coil */}
+              <circle cx="9" cy="13" r="3" fill="none" stroke="#4a3018" strokeWidth="1.2" />
+              <circle cx="9" cy="13" r="1.2" fill="#4a3018" />
+            </svg>
+
+            {/* card */}
             <div
-              className="photo"
-              style={{ backgroundImage: `url("${p.src}")` }}
-              role="img"
-              aria-label={p.caption}
-            />
-            <div className="caption">{p.caption}</div>
+              className="polaroid"
+              onClick={() => openCard(i)}
+              role="button"
+              tabIndex={0}
+              aria-label={`Открыть ${p.caption}`}
+            >
+              <div
+                className="photo"
+                style={{ backgroundImage: `url("${p.src}")` }}
+                role="img"
+                aria-label={p.caption}
+              />
+              <div className="caption">{p.caption}</div>
+            </div>
           </div>
-        ))}
-      </div>
+        );
+      })}
 
       <div className="controls">
         <button
           className="btn btn-accent"
           onClick={play}
-          disabled={phase === "playing"}
-          aria-label="Запустить анимацию"
+          disabled={phase === "running"}
         >
           ▶ Запуск
         </button>
@@ -474,7 +472,6 @@ export default function App() {
           className="btn"
           onClick={drop}
           disabled={phase !== "rest"}
-          aria-label="Сбросить карточки вниз"
         >
           ⬇ Drop
         </button>
